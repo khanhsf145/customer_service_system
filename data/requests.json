@@ -239,5 +239,33 @@
                 "time": "2025-04-20 03:32:59"
             }
         ]
+    },
+    "d49e6307-3927-48a8-b072-fd7a8cc79a71": {
+        "id": "d49e6307-3927-48a8-b072-fd7a8cc79a71",
+        "content": "Thay màn hình điện thoại",
+        "email": "hoangphankhanhhuyen0104@gmail.com",
+        "category": "Phần cứng",
+        "created_at": "2025-04-20 04:08:32",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-20 04:06:37",
+                "note": null
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-20 04:08:32",
+                "note": "Đã phân tích nội dung yêu cầu. Gợi ý phân loại: Trung bình.."
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-20 04:08:41",
+                "note": ""
+            }
+        ],
+        "assigned_to": null,
+        "customer_name": null,
+        "phone": null,
+        "priority": "Trung bình"
     }
 }
