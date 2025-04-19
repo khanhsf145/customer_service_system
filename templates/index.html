@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Dịch vụ Khách hàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">Hệ thống Dịch vụ Khách hàng</div>
+            <ul class="nav-links">
+                <li><a href="/">Trang chủ</a></li>
+                <li><a href="/customer.html">Khách hàng</a></li>
+                <li><a href="/login.html">Đăng nhập</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 2rem;">
+        <div class="card">
+            <div class="card-header">
+                <h2>Chào mừng đến với Hệ thống Hỗ trợ Khách hàng</h2>
+            </div>
+            <div class="card-body">
+                <p>Hệ thống quản lý và xử lý yêu cầu hỗ trợ khách hàng hiệu quả. Chúng tôi cam kết mang đến trải nghiệm tốt nhất và giải quyết các vấn đề của bạn một cách nhanh chóng.</p>
+
+                <div style="display: flex; justify-content: space-around; margin: 2rem 0;">
+                    <div style="text-align: center;">
+                        <h3>Dành cho Khách hàng</h3>
+                        <p>Gửi yêu cầu hỗ trợ và theo dõi trạng thái</p>
+                        <a href="/customer.html" class="btn" style="margin-top: 1rem;">Truy cập</a>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <h3>Dành cho Nhân viên</h3>
+                        <p>Đăng nhập để xử lý yêu cầu từ khách hàng</p>
+                        <a href="/login.html" class="btn" style="margin-top: 1rem;">Đăng nhập</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Kiểm tra trạng thái yêu cầu</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="request-id">Mã yêu cầu:</label>
+                    <input type="text" id="request-id" placeholder="Nhập mã yêu cầu của bạn">
+                </div>
+                <button class="btn" onclick="trackRequest()">Kiểm tra</button>
+
+                <div id="request-result" style="margin-top: 1.5rem; display: none;">
+                    <!-- Kết quả tra cứu sẽ hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ thống Dịch vụ Khách hàng. Bảo lưu mọi quyền.</p>
+        </div>
+    </footer>
+
+    <script>
+        function trackRequest() {
+            const requestId = document.getElementById('request-id').value.trim();
+            if (!requestId) {
+                alert('Vui lòng nhập mã yêu cầu');
+                return;
+            }
+
+            fetch(`/track/${requestId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không tìm thấy yêu cầu');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const resultDiv = document.getElementById('request-result');
+                    resultDiv.style.display = 'block';
+
+                    if (data.history && data.history.length > 0) {
+                        let html = '<h3>Thông tin yêu cầu:</h3>';
+                        html += '<div class="card" style="margin-top: 1rem;">';
+                        html += '<table class="table">';
+                        html += '<thead><tr><th>Thời gian</th><th>Trạng thái</th></tr></thead>';
+                        html += '<tbody>';
+
+                        data.history.forEach(item => {
+                            html += `<tr><td>${item.time}</td><td>${item.status}</td></tr>`;
+                        });
+
+                        html += '</tbody></table></div>';
+                        resultDiv.innerHTML = html;
+                    } else {
+                        resultDiv.innerHTML = '<div class="alert alert-warning">Chưa có thông tin trạng thái cho yêu cầu này.</div>';
+                    }
+                })
+                .catch(error => {
+                    const resultDiv = document.getElementById('request-result');
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+                });
+        }
+    </script>
+</body>
+</html>
