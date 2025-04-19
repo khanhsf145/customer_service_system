@@ -119,18 +119,32 @@
         ]
     },
     "1ee2af48-c301-4d2c-b8ca-d4b03b0f86cb": {
-        "data": "Khách yêu cầu bảo hành pin điện thoại",
+        "id": "1ee2af48-c301-4d2c-b8ca-d4b03b0f86cb",
+        "content": "Khách yêu cầu bảo hành pin điện thoại",
         "email": "khanhhuyen412005@gmail.com",
+        "category": "Chung",
+        "created_at": "2025-04-20 03:43:15",
         "history": [
             {
                 "status": "Đã tiếp nhận",
-                "time": "2025-04-19 10:12:02"
+                "time": "2025-04-19 10:12:02",
+                "note": null
             },
             {
                 "status": "Đã phân tích",
-                "time": "2025-04-19 10:12:11"
+                "time": "2025-04-19 10:12:11",
+                "note": null
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-20 03:43:15",
+                "note": ""
             }
-        ]
+        ],
+        "assigned_to": null,
+        "customer_name": null,
+        "phone": null,
+        "priority": "Trung bình"
     },
     "f4d194ab-e823-42b1-95f8-f456caacd004": {
         "data": "Khách yêu cầu bảo hành pin điện thoại",
@@ -205,6 +219,24 @@
             {
                 "status": "Đã xử lý",
                 "time": "2025-04-19 16:35:28"
+            }
+        ]
+    },
+    "bcd0e45d-20da-4c0a-9c71-1aed8bab5238": {
+        "data": "Thay pin dien thoai",
+        "email": "hoangphankhanhhuyen0104@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-20 03:32:54"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-20 03:32:58"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-20 03:32:59"
             }
         ]
     }

@@ -232,7 +232,7 @@
                 });
         }
 
-        // Xem chi tiết yêu cầu
+        // Xem chi tiết yêu cầu (ví dụ: hiển thị trong alert)
         function viewRequestDetails(requestId) {
             fetch(`/customer/status/${requestId}`)
                 .then(response => {
@@ -242,4 +242,22 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Hiển thị modal chi ti
+                    let detailHtml = `Mã yêu cầu: ${data.id}\n`;
+                    detailHtml += `Nội dung: ${data.content || 'N/A'}\n`;
+                    detailHtml += `Danh mục: ${data.category || 'Chung'}\n`;
+                    detailHtml += `Trạng thái hiện tại: ${data.status || 'N/A'}\n\n`;
+                    detailHtml += `Lịch sử:\n`;
+                    if (data.history && data.history.length > 0) {
+                        data.history.forEach(h => {
+                            detailHtml += `- ${h.time}: ${h.status} ${h.note ? '(' + h.note + ')' : ''}\n`;
+                        });
+                    } else {
+                        detailHtml += "Chưa có lịch sử.";
+                    }
+                    // Hiển thị bằng alert, bạn có thể thay bằng modal đẹp hơn
+                    alert(detailHtml);
+                })
+                .catch(error => {
+                    alert(`Lỗi: ${error.message}`);
+                });
+    </script>
