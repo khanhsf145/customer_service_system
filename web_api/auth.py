@@ -6,7 +6,7 @@ import json
 import os
 
 # Cấu hình
-SECRET_KEY = "YOUR_SECRET_KEY_HERE"  # Thay đổi key này trong sản phẩm thực tế
+SECRET_KEY = "khanhsf145"  # Thay đổi key này trong sản phẩm thực tế
 TOKEN_EXPIRE_HOURS = 24
 USER_FILE = "data/users.json"
 

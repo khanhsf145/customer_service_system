@@ -82,17 +82,21 @@
 #         "history": data[request_id].get("history", [])
 #     })
 
-from flask import Flask, request, jsonify
 from web_api.dcom_client import call_dcom_method
-from web_api.tracking import get_request_status, save_request, load_requests, save_requests
-from web_api.tracking import update_request_status
+from web_api.tracking import get_request_status, save_request, load_requests, save_requests, update_request_status
 from datetime import datetime
 from web_api.email_util import send_notification_email
+from flask import Flask, request, jsonify, render_template, redirect, url_for # Thêm render_template, redirect, url_for
+import os # Thêm thư viện os
 from web_api.views.customer_views import customer_api
 from web_api.views.staff_views import staff_api
 import uuid
 
-app = Flask(__name__)
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+app = Flask(__name__,
+            static_folder=os.path.join(project_root, 'static'),
+            template_folder=os.path.join(project_root, 'templates'))
 
 # Đăng ký các blueprint API
 app.register_blueprint(customer_api, url_prefix='/customer')
@@ -168,3 +172,31 @@ def track_request(request_id):
         "id": request_id,
         "history": data[request_id].get("history", [])
     })
+
+@app.route('/')
+def index():
+    # Trả về file index.html từ thư mục templates
+    return render_template('index.html')
+
+@app.route('/customer.html')
+def customer_page():
+    return render_template('customer.html')
+
+@app.route('/login.html')
+def login_page():
+    return render_template('login.html')
+
+@app.route('/staff.html')
+# @token_required # Có thể cần thêm decorator này để yêu cầu đăng nhập mới vào được trang staff
+def staff_page():
+    # Kiểm tra xem có token không trước khi render
+    # Đoạn kiểm tra token này nên đưa vào decorator nếu muốn chặt chẽ
+    # from web_api.auth import token_required # Cần import nếu dùng decorator
+    return render_template('staff.html')
+
+@app.route('/admin.html')
+# @token_required
+# @admin_required # Có thể cần thêm decorator này
+def admin_page():
+     # Kiểm tra token và quyền admin
+     return render_template('admin.html')
