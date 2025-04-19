@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khách hàng - Hệ thống Dịch vụ Khách hàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/customer.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">Hệ thống Dịch vụ Khách hàng</div>
+            <ul class="nav-links">
+                <li><a href="/">Trang chủ</a></li>
+                <li><a href="/customer.html" class="active">Khách hàng</a></li>
+                <li><a href="/login.html">Đăng nhập</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: 2rem;">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('new-request')">Gửi yêu cầu mới</button>
+            <button class="tab-btn" onclick="openTab('my-requests')">Yêu cầu của tôi</button>
+        </div>
+
+        <div id="new-request" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Gửi yêu cầu hỗ trợ</h2>
+                </div>
+                <div class="card-body">
+                    <div id="submit-message" class="alert" style="display: none;"></div>
+
+                    <div class="form-group">
+                        <label for="content">Nội dung yêu cầu:</label>
+                        <textarea id="content" placeholder="Mô tả chi tiết vấn đề của bạn"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Danh mục:</label>
+                        <select id="category">
+                            <option value="Chung">Chung</option>
+                            <option value="Phần mềm">Phần mềm</option>
+                            <option value="Phần cứng">Phần cứng</option>
+                            <option value="Bảo hành">Bảo hành</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email liên hệ:</label>
+                        <input type="email" id="email" placeholder="Nhập email của bạn">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Họ và tên:</label>
+                        <input type="text" id="name" placeholder="Nhập họ tên của bạn">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại:</label>
+                        <input type="text" id="phone" placeholder="Nhập số điện thoại của bạn">
+                    </div>
+
+                    <button class="btn" onclick="submitRequest()">Gửi yêu cầu</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="my-requests" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Yêu cầu của tôi</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="search-email">Email đã sử dụng:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="email" id="search-email" placeholder="Nhập email của bạn">
+                            <button class="btn" onclick="fetchMyRequests()">Tìm kiếm</button>
+                        </div>
+                    </div>
+
+                    <div id="my-requests-list" style="margin-top: 1.5rem;">
+                        <!-- Danh sách yêu cầu sẽ hiển thị ở đây -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hệ thống Dịch vụ Khách hàng. Bảo lưu mọi quyền.</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/customer.js"></script>
+    <script>
+        // Chuyển đổi giữa các tab
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Gửi yêu cầu mới
+        function submitRequest() {
+            const content = document.getElementById('content').value.trim();
+            const category = document.getElementById('category').value;
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const messageElement = document.getElementById('submit-message');
+
+            if (!content || !email) {
+                messageElement.textContent = 'Vui lòng nhập nội dung yêu cầu và email';
+                messageElement.className = 'alert alert-danger';
+                messageElement.style.display = 'block';
+                return;
+            }
+
+            // Gọi API để gửi yêu cầu
+            fetch('/customer/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: content,
+                    category: category,
+                    email: email,
+                    customer_name: name,
+                    phone: phone
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Có lỗi xảy ra khi gửi yêu cầu');
+                }
+                return response.json();
+            })
+            .then(data => {
+                messageElement.textContent = `Yêu cầu đã được gửi thành công! Mã yêu cầu của bạn là: ${data.id}`;
+                messageElement.className = 'alert alert-success';
+                messageElement.style.display = 'block';
+
+                // Xóa form
+                document.getElementById('content').value = '';
+
+                // Lưu email vào localStorage để tiện sử dụng sau này
+                localStorage.setItem('last_email', email);
+            })
+            .catch(error => {
+                messageElement.textContent = error.message;
+                messageElement.className = 'alert alert-danger';
+                messageElement.style.display = 'block';
+            });
+        }
+
+        // Lấy danh sách yêu cầu của khách hàng
+        function fetchMyRequests() {
+            const email = document.getElementById('search-email').value.trim();
+            const listElement = document.getElementById('my-requests-list');
+
+            if (!email) {
+                listElement.innerHTML = '<div class="alert alert-warning">Vui lòng nhập email của bạn</div>';
+                return;
+            }
+
+            fetch(`/customer/all?email=${encodeURIComponent(email)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Có lỗi xảy ra khi lấy danh sách yêu cầu');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (Object.keys(data.requests).length === 0) {
+                        listElement.innerHTML = '<div class="alert alert-info">Không tìm thấy yêu cầu nào với email này</div>';
+                        return;
+                    }
+
+                    let html = '<div class="requests-list">';
+
+                    for (const [id, request] of Object.entries(data.requests)) {
+                        const latestStatus = request.history && request.history.length > 0
+                            ? request.history[request.history.length - 1].status
+                            : 'Chưa xác định';
+
+                        let statusClass = '';
+                        if (latestStatus === 'Đã tiếp nhận') statusClass = 'status-pending';
+                        else if (latestStatus === 'Đã phân tích') statusClass = 'status-analyzing';
+                        else if (latestStatus === 'Đã xử lý') statusClass = 'status-processed';
+
+                        html += `
+                            <div class="request-item">
+                                <div class="request-header">
+                                    <div>
+                                        <h3 class="request-id">Mã: ${id}</h3>
+                                        <span class="status ${statusClass}">${latestStatus}</span>
+                                    </div>
+                                    <button class="btn btn-secondary btn-sm" onclick="viewRequestDetails('${id}')">Chi tiết</button>
+                                </div>
+                                <div class="request-content">
+                                    <p>${request.content || request.data}</p>
+                                </div>
+                                <div class="request-footer">
+                                    <span>Danh mục: ${request.category || 'Chung'}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    html += '</div>';
+                    listElement.innerHTML = html;
+                })
+                .catch(error => {
+                    listElement.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+                });
+        }
+
+        // Xem chi tiết yêu cầu
+        function viewRequestDetails(requestId) {
+            fetch(`/customer/status/${requestId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không tìm thấy thông tin yêu cầu');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hiển thị modal chi ti
