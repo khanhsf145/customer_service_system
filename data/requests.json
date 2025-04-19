@@ -22,5 +22,150 @@
     "964576ef-6826-4bcd-be36-c143a2049c02": {
         "content": "DDang thuwr nghieemj",
         "status": "Đã xử lý"
+    },
+    "a0ffa45c-0a11-4c47-ad54-a943f383be96": {
+        "content": "Khách yêu cầu bảo hành màn hình",
+        "status": "Đã tiếp nhận",
+        "history": [
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-18 23:31:19"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-18 23:31:31"
+            }
+        ]
+    },
+    "272a9f04-6e5a-43c3-922a-fa0f18644849": {
+        "content": "Test moi 3",
+        "status": "Đã tiếp nhận",
+        "history": [
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-18 23:33:33"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-18 23:33:39"
+            }
+        ]
+    },
+    "9c8006c7-1809-435f-a688-ba37a2de5c56": {
+        "data": "Test lan 4",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-18 23:38:29"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-18 23:38:31"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-18 23:38:36"
+            }
+        ]
+    },
+    "330ca914-c52d-40ec-9aea-e37f4b1f53df": {
+        "data": "Test gui email",
+        "email": "khhuien145@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-18 23:46:32"
+            }
+        ]
+    },
+    "8345cc8d-422c-4b7b-ac56-54748db06fc8": {
+        "data": "Test gui email",
+        "email": "khhuien145@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-18 23:46:36"
+            }
+        ]
+    },
+    "563347e8-1291-4638-bb74-8f931f8417ce": {
+        "data": "Test moiws sangs thuws 7",
+        "email": "khanhhuyen412005@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 09:50:25"
+            }
+        ]
+    },
+    "baec1024-6669-47de-a52c-d86d101d2fca": {
+        "data": "Test moiws sangs thuws 7",
+        "email": "khanhhuyen412005@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 09:51:08"
+            }
+        ]
+    },
+    "41f9dd7f-6558-4fb8-a2bf-3c32435d02a8": {
+        "data": "Khách yêu cầu bảo hành pin điện thoại",
+        "email": "khanhhuyen412005@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 10:03:51"
+            }
+        ]
+    },
+    "1ee2af48-c301-4d2c-b8ca-d4b03b0f86cb": {
+        "data": "Khách yêu cầu bảo hành pin điện thoại",
+        "email": "khanhhuyen412005@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 10:12:02"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-19 10:12:11"
+            }
+        ]
+    },
+    "f4d194ab-e823-42b1-95f8-f456caacd004": {
+        "data": "Khách yêu cầu bảo hành pin điện thoại",
+        "email": "khanhhuyen412005@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 10:22:12"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-19 10:22:14"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-19 10:22:16"
+            }
+        ]
+    },
+    "93a28bf5-0e05-4f2c-9fc8-5b6aba9425b6": {
+        "data": "Khách yêu cầu bảo hành pin điện thoại",
+        "email": "hoangphankhanhhuyen0104@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-19 10:42:36"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-19 10:42:39"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-19 10:42:41"
+            }
+        ]
     }
 }
