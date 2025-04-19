@@ -1,3 +1,0 @@
-Chạy file run_dcom_server.py, sau đó chạy run_web_api.py
-\nAe vào gui\main_gui.py để chạy thử DCOM gửi yêu cầu
-\nCòn không thì sau khi chạy run_web_api.py, có cái link hiện ra là nhấn zô dùng luôn nhóe
