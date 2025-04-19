@@ -4,9 +4,12 @@ from web_api.tracking import get_request_status, save_request, load_requests, sa
 from web_api.tracking import update_request_status
 from datetime import datetime
 from web_api.email_util import send_notification_email
+from web_api.views.customer_views import customer_api
 import uuid
 
 app = Flask(__name__)
+
+app.register_blueprint(customer_api, url_prefix='/customer')
 
 @app.route("/receive", methods=["POST"])
 def receive_request():
