@@ -1,5 +1,4 @@
-# web_api/tracking.py
-
+from datetime import datetime
 import json
 import os
 
@@ -33,5 +32,9 @@ def get_request_status(request_id):
 def update_request_status(request_id, status):
     data = load_requests()
     if request_id in data:
-        data[request_id]["status"] = status
+        # Thêm bản ghi lịch sử trạng thái
+        entry = {"status": status, "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        if "history" not in data[request_id]:
+            data[request_id]["history"] = []
+        data[request_id]["history"].append(entry)
         save_requests(data)
