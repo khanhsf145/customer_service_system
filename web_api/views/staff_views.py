@@ -72,34 +72,6 @@ def get_request_details(request_id):
     return jsonify(request_obj.to_dict())
 
 
-@staff_api.route("/request/<request_id>/analyze", methods=["POST"])
-@token_required
-@staff_required
-def analyze_request(request_id):
-    """Phân tích yêu cầu"""
-    all_data = load_requests()
-    if request_id not in all_data:
-        return jsonify({"error": "Không tìm thấy yêu cầu"}), 404
-
-    request_obj = CustomerRequest.from_dict({**all_data[request_id], "id": request_id})
-    data = request.json.get("note", "")
-
-    try:
-        result = call_dcom_method("AnalyzeRequest", request_obj.content)
-        request_obj.add_status("Đã phân tích", data)
-
-        # Cập nhật lại dữ liệu
-        all_data[request_id] = request_obj.to_dict()
-        save_requests(all_data)
-
-        return jsonify({
-            "result": result,
-            "request": request_obj.to_dict()
-        })
-    except Exception as e:
-        return jsonify({"error": f"Lỗi khi phân tích: {str(e)}"}), 500
-
-
 @staff_api.route("/request/<request_id>/process", methods=["POST"])
 @token_required
 @staff_required
@@ -292,3 +264,54 @@ def login():
         "token": token,
         "user": user_data
     })
+
+@staff_api.route("/request/<request_id>/analyze", methods=["POST"])
+@token_required
+@staff_required
+def analyze_request(request_id):
+    """Phân tích yêu cầu và tự động cập nhật độ ưu tiên"""
+    all_data = load_requests()
+    if request_id not in all_data:
+        return jsonify({"error": "Không tìm thấy yêu cầu"}), 404
+
+    request_obj = CustomerRequest.from_dict({**all_data[request_id], "id": request_id})
+    note = request.json.get("note", "") # Ghi chú từ nhân viên (nếu có)
+
+    try:
+        # Gọi DCOM để phân tích
+        dcom_result_raw = call_dcom_method("AnalyzeRequest", request_obj.content)
+
+        # --- Tách kết quả từ DCOM ---
+        analysis_text = dcom_result_raw # Mặc định lấy toàn bộ nếu không tách được
+        determined_priority = request_obj.priority # Giữ priority cũ nếu không tách được
+
+        if isinstance(dcom_result_raw, str) and "|Priority:" in dcom_result_raw:
+            parts = dcom_result_raw.split("|Priority:", 1)
+            analysis_text = parts[0].strip()
+            priority_from_dcom = parts[1].strip()
+            # Chỉ cập nhật nếu priority trả về hợp lệ
+            if priority_from_dcom in ["Thấp", "Trung bình", "Cao", "Khẩn cấp"]:
+                 determined_priority = priority_from_dcom
+            else:
+                 print(f"Warning: Priority '{priority_from_dcom}' from DCOM is not valid.")
+
+
+        # --- Cập nhật đối tượng request ---
+        request_obj.add_status("Đã phân tích", f"{analysis_text}. {note}".strip())
+        request_obj.priority = determined_priority # Cập nhật độ ưu tiên
+
+        # Cập nhật lại dữ liệu trong file JSON
+        all_data[request_id] = request_obj.to_dict()
+        save_requests(all_data)
+
+        # Trả về kết quả phân tích và request đã cập nhật
+        return jsonify({
+            "result": analysis_text, # Trả về phần text phân tích
+            "priority_detected": determined_priority, # Trả về priority đã xác định
+            "request": request_obj.to_dict() # Trả về toàn bộ object request đã cập nhật
+        })
+    except Exception as e:
+        # Ghi log lỗi chi tiết hơn nếu cần
+        print(f"Lỗi nghiêm trọng khi phân tích yêu cầu {request_id}: {e}")
+        # traceback.print_exc() # In traceback để debug nếu cần
+        return jsonify({"error": f"Lỗi khi phân tích: {str(e)}"}), 500

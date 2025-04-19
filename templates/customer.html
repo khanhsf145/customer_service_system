@@ -7,6 +7,69 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/customer.css">
+    <style>
+        /* CSS cho phần chi tiết yêu cầu */
+        #request-details-view {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: none; /* Ẩn ban đầu */
+        }
+        #request-details-view h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        #request-details-view .close-btn {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--danger-color);
+        }
+         /* Thêm CSS cho bảng lịch sử */
+        .history-table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+        }
+        .history-table th, .history-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .history-table th {
+            background-color: #eee;
+        }
+        .tab-content {
+            display: none; /* Quan trọng: Ẩn các tab không active */
+            padding-top: 20px; /* Thêm padding để nội dung không dính vào tab */
+        }
+        .tab-content.active {
+            display: block; /* Quan trọng: Hiện tab active */
+        }
+        .tab-btn {
+            /* CSS cơ bản cho nút, bạn có thể điều chỉnh */
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            margin-right: -1px;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-btn.active {
+            background-color: white;
+            border-bottom: 1px solid white; /* Che đường kẻ dưới của .tabs */
+            font-weight: bold;
+            position: relative; /* Giúp căn chỉnh nếu cần */
+        }
+        .tabs {
+             border-bottom: 1px solid #ccc; /* Đường kẻ ngang dưới các tab */
+             margin-bottom: 0;
+             padding-left: 10px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
@@ -22,12 +85,12 @@
 
     <main class="container" style="margin-top: 2rem;">
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('new-request')">Gửi yêu cầu mới</button>
-            <button class="tab-btn" onclick="openTab('my-requests')">Yêu cầu của tôi</button>
+            <button class="tab-btn active" onclick="openTab(event, 'new-request')">Gửi yêu cầu mới</button>
+            <button class="tab-btn" onclick="openTab(event, 'my-requests')">Yêu cầu của tôi</button>
         </div>
 
         <div id="new-request" class="tab-content active">
-            <div class="card">
+           <div class="card">
                 <div class="card-header">
                     <h2>Gửi yêu cầu hỗ trợ</h2>
                 </div>
@@ -72,7 +135,7 @@
 
         <div id="my-requests" class="tab-content">
             <div class="card">
-                <div class="card-header">
+                 <div class="card-header">
                     <h2>Yêu cầu của tôi</h2>
                 </div>
                 <div class="card-body">
@@ -85,7 +148,13 @@
                     </div>
 
                     <div id="my-requests-list" style="margin-top: 1.5rem;">
-                        <!-- Danh sách yêu cầu sẽ hiển thị ở đây -->
+                        </div>
+
+                    <div id="request-details-view">
+                        <span class="close-btn" onclick="closeDetailsView()">[Đóng]</span>
+                        <h3>Chi tiết yêu cầu <span id="details-request-id"></span></h3>
+                        <div id="details-content-area">
+                            </div>
                     </div>
                 </div>
             </div>
@@ -98,26 +167,32 @@
         </div>
     </footer>
 
-    <script src="/static/js/customer.js"></script>
     <script>
-        // Chuyển đổi giữa các tab
-        function openTab(tabName) {
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
+        function openTab(event, tabName) {
+             const tabContents = document.getElementsByClassName('tab-content');
+             for (let i = 0; i < tabContents.length; i++) {
+                 tabContents[i].classList.remove('active'); // Hide all content divs
+             }
 
-            const tabButtons = document.getElementsByClassName('tab-btn');
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove('active');
-            }
+             const tabButtons = document.getElementsByClassName('tab-btn');
+             for (let i = 0; i < tabButtons.length; i++) {
+                 tabButtons[i].classList.remove('active'); // Deactivate all buttons
+             }
 
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+             document.getElementById(tabName).classList.add('active'); // Show the target content div
+             // Dùng event.currentTarget để chắc chắn lấy đúng nút được nhấn
+             if(event && event.currentTarget) {
+                 event.currentTarget.classList.add('active'); // Activate the clicked button
+             }
 
-        // Gửi yêu cầu mới
+
+             // Ẩn view chi tiết khi chuyển tab
+             closeDetailsView();
+         }
+
+        // Hàm submitRequest giữ nguyên
         function submitRequest() {
+           // ... (code giữ nguyên) ...
             const content = document.getElementById('content').value.trim();
             const category = document.getElementById('category').value;
             const email = document.getElementById('email').value.trim();
@@ -148,7 +223,12 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Có lỗi xảy ra khi gửi yêu cầu');
+                    // Cố gắng đọc lỗi từ JSON nếu có
+                    return response.json().then(errData => {
+                        throw new Error(errData.error || 'Có lỗi xảy ra khi gửi yêu cầu');
+                    }).catch(() => {
+                         throw new Error('Có lỗi xảy ra khi gửi yêu cầu (không thể đọc chi tiết lỗi)');
+                    });
                 }
                 return response.json();
             })
@@ -159,6 +239,10 @@
 
                 // Xóa form
                 document.getElementById('content').value = '';
+                document.getElementById('email').value = ''; // Có thể xóa hoặc giữ lại email
+                document.getElementById('name').value = '';
+                document.getElementById('phone').value = '';
+
 
                 // Lưu email vào localStorage để tiện sử dụng sau này
                 localStorage.setItem('last_email', email);
@@ -170,59 +254,82 @@
             });
         }
 
-        // Lấy danh sách yêu cầu của khách hàng
+        // Hàm fetchMyRequests giữ nguyên
         function fetchMyRequests() {
+            // ... (code giữ nguyên) ...
             const email = document.getElementById('search-email').value.trim();
             const listElement = document.getElementById('my-requests-list');
+            closeDetailsView(); // Ẩn chi tiết cũ khi tìm kiếm mới
 
             if (!email) {
                 listElement.innerHTML = '<div class="alert alert-warning">Vui lòng nhập email của bạn</div>';
                 return;
             }
+             listElement.innerHTML = '<p>Đang tải...</p>'; // Thông báo đang tải
 
             fetch(`/customer/all?email=${encodeURIComponent(email)}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Có lỗi xảy ra khi lấy danh sách yêu cầu');
+                        // Cố gắng đọc lỗi từ JSON nếu có
+                         return response.json().then(errData => {
+                            throw new Error(errData.error || 'Có lỗi xảy ra khi lấy danh sách yêu cầu');
+                        }).catch(() => {
+                             throw new Error('Có lỗi xảy ra khi lấy danh sách yêu cầu (không thể đọc chi tiết lỗi)');
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    if (Object.keys(data.requests).length === 0) {
+                    if (!data.requests || Object.keys(data.requests).length === 0) {
                         listElement.innerHTML = '<div class="alert alert-info">Không tìm thấy yêu cầu nào với email này</div>';
                         return;
                     }
 
                     let html = '<div class="requests-list">';
 
-                    for (const [id, request] of Object.entries(data.requests)) {
-                        const latestStatus = request.history && request.history.length > 0
-                            ? request.history[request.history.length - 1].status
-                            : 'Chưa xác định';
+                    // Sắp xếp yêu cầu theo thời gian tạo (mới nhất trước) - giả sử có trường created_at
+                     const sortedIds = Object.keys(data.requests).sort((a, b) => {
+                        const timeA = data.requests[a].created_at || (data.requests[a].history && data.requests[a].history.length > 0 ? data.requests[a].history[0].time : '0');
+                        const timeB = data.requests[b].created_at || (data.requests[b].history && data.requests[b].history.length > 0 ? data.requests[b].history[0].time : '0');
+                        return new Date(timeB) - new Date(timeA); // So sánh ngược để mới nhất lên đầu
+                    });
+
+
+                    //for (const [id, request] of Object.entries(data.requests)) {
+                    sortedIds.forEach(id => {
+                         const request = data.requests[id];
+                        const latestStatusEntry = request.history && request.history.length > 0
+                            ? request.history[request.history.length - 1]
+                            : null;
+                        const latestStatus = latestStatusEntry ? latestStatusEntry.status : 'Chưa xác định';
+                        const createdAt = request.created_at || (request.history && request.history.length > 0 ? request.history[0].time : 'N/A');
+
 
                         let statusClass = '';
                         if (latestStatus === 'Đã tiếp nhận') statusClass = 'status-pending';
-                        else if (latestStatus === 'Đã phân tích') statusClass = 'status-analyzing';
-                        else if (latestStatus === 'Đã xử lý') statusClass = 'status-processed';
+                        else if (latestStatus === 'Đã phân tích' || latestStatus === 'Đang kiểm tra') statusClass = 'status-analyzing';
+                        else if (latestStatus === 'Đã xử lý' || latestStatus === 'Đã giải quyết' || latestStatus === 'Đóng yêu cầu') statusClass = 'status-processed';
+                        else statusClass = 'status-pending'; // Trạng thái khác
 
                         html += `
                             <div class="request-item">
                                 <div class="request-header">
                                     <div>
-                                        <h3 class="request-id">Mã: ${id}</h3>
+                                        <h3 class="request-id">Mã: ${id.substring(0, 8)}...</h3>
                                         <span class="status ${statusClass}">${latestStatus}</span>
                                     </div>
                                     <button class="btn btn-secondary btn-sm" onclick="viewRequestDetails('${id}')">Chi tiết</button>
                                 </div>
                                 <div class="request-content">
-                                    <p>${request.content || request.data}</p>
-                                </div>
+                                    <p><strong>Ngày tạo:</strong> ${createdAt}</p>
+                                    <p>${(request.content || request.data || '').substring(0, 100)}...</p> </div>
                                 <div class="request-footer">
                                     <span>Danh mục: ${request.category || 'Chung'}</span>
+                                    <span>Ưu tiên: ${request.priority || 'Trung bình'}</span>
                                 </div>
                             </div>
                         `;
-                    }
+                    });//}
 
                     html += '</div>';
                     listElement.innerHTML = html;
@@ -232,32 +339,76 @@
                 });
         }
 
-        // Xem chi tiết yêu cầu (ví dụ: hiển thị trong alert)
+        // *** Sửa hàm viewRequestDetails ***
         function viewRequestDetails(requestId) {
+            const detailsView = document.getElementById('request-details-view');
+            const detailsContent = document.getElementById('details-content-area');
+            const detailsIdSpan = document.getElementById('details-request-id');
+
+            detailsContent.innerHTML = '<p>Đang tải chi tiết...</p>';
+            detailsIdSpan.textContent = `(${requestId.substring(0,8)}...)`;
+            detailsView.style.display = 'block'; // Hiển thị khu vực chi tiết
+
             fetch(`/customer/status/${requestId}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Không tìm thấy thông tin yêu cầu');
+                         return response.json().then(errData => {
+                            throw new Error(errData.error || 'Không tìm thấy thông tin yêu cầu');
+                        }).catch(() => {
+                             throw new Error('Không tìm thấy thông tin yêu cầu (không thể đọc chi tiết lỗi)');
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    let detailHtml = `Mã yêu cầu: ${data.id}\n`;
-                    detailHtml += `Nội dung: ${data.content || 'N/A'}\n`;
-                    detailHtml += `Danh mục: ${data.category || 'Chung'}\n`;
-                    detailHtml += `Trạng thái hiện tại: ${data.status || 'N/A'}\n\n`;
-                    detailHtml += `Lịch sử:\n`;
+                    let detailHtml = `<p><strong>Mã yêu cầu:</strong> ${data.id}</p>`;
+                    detailHtml += `<p><strong>Danh mục:</strong> ${data.category || 'Chung'}</p>`;
+                     detailHtml += `<p><strong>Độ ưu tiên:</strong> ${data.priority || 'Trung bình'}</p>`;
+                    detailHtml += `<p><strong>Trạng thái hiện tại:</strong> ${data.status || 'N/A'}</p>`;
+                    detailHtml += `<h4>Nội dung:</h4><p style="background-color: #fff; padding: 10px; border-radius: 4px; white-space: pre-wrap;">${data.content || 'N/A'}</p>`; // white-space: pre-wrap để giữ định dạng xuống dòng
+
+                    detailHtml += `<h4>Lịch sử xử lý:</h4>`;
                     if (data.history && data.history.length > 0) {
-                        data.history.forEach(h => {
-                            detailHtml += `- ${h.time}: ${h.status} ${h.note ? '(' + h.note + ')' : ''}\n`;
+                        detailHtml += '<table class="history-table"><thead><tr><th>Thời gian</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead><tbody>';
+                        // Sắp xếp lịch sử theo thời gian giảm dần (mới nhất trước)
+                         const sortedHistory = data.history.sort((a, b) => new Date(b.time) - new Date(a.time));
+                        sortedHistory.forEach(h => {
+                            detailHtml += `<tr><td>${h.time}</td><td>${h.status}</td><td>${h.note || ''}</td></tr>`;
                         });
+                         detailHtml += '</tbody></table>';
                     } else {
-                        detailHtml += "Chưa có lịch sử.";
+                        detailHtml += "<p>Chưa có lịch sử.</p>";
                     }
-                    // Hiển thị bằng alert, bạn có thể thay bằng modal đẹp hơn
-                    alert(detailHtml);
+
+                    detailsContent.innerHTML = detailHtml;
+                     // Cuộn trang xuống phần chi tiết
+                    detailsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 })
                 .catch(error => {
-                    alert(`Lỗi: ${error.message}`);
+                    detailsContent.innerHTML = `<p style="color: red;">Lỗi: ${error.message}</p>`;
                 });
+        }
+
+         // Hàm đóng view chi tiết
+        function closeDetailsView() {
+            const detailsView = document.getElementById('request-details-view');
+            detailsView.style.display = 'none';
+        }
+
+        // Tự động điền email nếu có trong localStorage khi tải trang
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastEmail = localStorage.getItem('last_email');
+            if (lastEmail) {
+                document.getElementById('search-email').value = lastEmail;
+                // Tùy chọn: tự động tìm kiếm luôn khi có email cũ
+                 // fetchMyRequests();
+            }
+             // Gán email cho cả form gửi nếu muốn
+             // if (lastEmail) {
+             //     document.getElementById('email').value = lastEmail;
+             // }
+        });
+
     </script>
+</body>
+</html>
