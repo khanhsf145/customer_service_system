@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 import requests
 
-API_BASE = "http://127.0.0.1:5000"
+API_BASE = "http://172.18.60.23"
 
 class ServiceApp:
     def __init__(self, root):

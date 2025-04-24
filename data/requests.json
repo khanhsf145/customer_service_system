@@ -267,5 +267,66 @@
         "customer_name": null,
         "phone": null,
         "priority": "Trung bình"
+    },
+    "851b7579-8ce4-4b87-8b7c-b7063f04081a": {
+        "data": "Thay cong sac",
+        "email": "hoangphankhanhhuyen0104@gmail.com",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-21 11:28:04"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-21 11:28:08"
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-21 11:28:17"
+            }
+        ]
+    },
+    "5b98b6d7-854f-43cb-a26c-b7cc3e7830b0": {
+        "id": "5b98b6d7-854f-43cb-a26c-b7cc3e7830b0",
+        "content": "Sao khong hien thi tren trang web vay tr",
+        "email": "hoangphankhanhhuyen0104@gmail.com",
+        "category": "Chung",
+        "created_at": "2025-04-23 08:07:39",
+        "history": [
+            {
+                "status": "Đã tiếp nhận",
+                "time": "2025-04-23 08:05:42",
+                "note": null
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-23 08:05:46",
+                "note": null
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-23 08:05:49",
+                "note": null
+            },
+            {
+                "status": "Đã phân công",
+                "time": "2025-04-23 08:07:39",
+                "note": "Phân công cho jcfdvb"
+            },
+            {
+                "status": "Đã phân tích",
+                "time": "2025-04-23 08:07:50",
+                "note": "Đã phân tích nội dung yêu cầu. Gợi ý phân loại: Trung bình.."
+            },
+            {
+                "status": "Đã xử lý",
+                "time": "2025-04-23 08:08:00",
+                "note": ""
+            }
+        ],
+        "assigned_to": "jcfdvb",
+        "customer_name": null,
+        "phone": null,
+        "priority": "Trung bình"
     }
 }
