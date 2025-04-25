@@ -16,7 +16,7 @@ class ServiceApp:
         self.entry_content = tk.Entry(root, width=50)
         self.entry_content.pack()
 
-        # Thêm sau phần nhập nội dung
+        # Email
         tk.Label(root, text="Email người nhận:").pack()
         self.entry_email = tk.Entry(root, width=50)
         self.entry_email.pack()
@@ -27,8 +27,8 @@ class ServiceApp:
         # Nút phân tích
         tk.Button(root, text="Phân tích", command=self.analyze_request).pack(pady=5)
 
-        # Nút xử lý
-        tk.Button(root, text="Xử lý", command=self.process_request).pack(pady=5)
+        # Nút giải quyết
+        tk.Button(root, text="Giải quyết", command=self.process_request).pack(pady=5)
 
         # Nhập ID để theo dõi
         tk.Label(root, text="ID yêu cầu:").pack()
@@ -42,47 +42,42 @@ class ServiceApp:
         content = self.entry_content.get()
         email = self.entry_email.get()
         if not content or not email:
-            messagebox.showerror("Lỗi", "Vui lòng nhập nội dung và email.")
+            messagebox.showerror("Lỗi!", "Vui lòng nhập nội dung và email của bạn.")
             return
         try:
             res = requests.post(
                 f"{API_BASE}/receive",
-                json={"data": content, "email": email}  # <-- phải là JSON
+                json={"data": content, "email": email}
             )
             if res.status_code == 200:
                 request_id = res.json().get("id")
                 self.entry_id.delete(0, tk.END)
                 self.entry_id.insert(0, request_id)
-                messagebox.showinfo("Thành công", "Đã tiếp nhận yêu cầu.")
+                messagebox.showinfo("Thành công!", "Đã tiếp nhận yêu cầu.")
             else:
-                messagebox.showerror("Lỗi", res.text)
+                messagebox.showerror("Lỗi!", res.text)
         except Exception as e:
-            messagebox.showerror("Lỗi", str(e))
+            messagebox.showerror("Lỗi!", str(e))
 
     def analyze_request(self):
         content = self.entry_content.get()
         request_id = self.entry_id.get()
         if not content or not request_id:
-            messagebox.showerror("Lỗi", "Nhập đầy đủ nội dung và ID.")
+            messagebox.showerror("Lỗi!", "Vui lòng nhập nội dung và ID của yêu cầu.")
             return
         res = requests.post(f"{API_BASE}/analyze", json={"id": request_id, "data": content})
         if res.ok:
             messagebox.showinfo("Phân tích", res.json()["result"])
         else:
-            messagebox.showerror("Lỗi", res.text)
+            messagebox.showerror("Lỗi!", res.text)
 
     def process_request(self):
         content = self.entry_content.get()
         request_id = self.entry_id.get()
         email = self.entry_email.get()
         if not content or not request_id or not email:
-            messagebox.showerror("Lỗi", "Hãy nhập đầy đủ các trường dữ liệu.")
+            messagebox.showerror("Lỗi!", "Hãy nhập đầy đủ các trường dữ liệu.")
             return
-        # res = requests.post(f"{API_BASE}/process", json={"id": request_id, "data": content})
-        # if res.ok:
-        #     messagebox.showinfo("Xử lý", res.json()["result"])
-        # else:
-        #     messagebox.showerror("Lỗi", res.text)
         try:
             res = requests.post(
                 f"{API_BASE}/process",
@@ -91,14 +86,14 @@ class ServiceApp:
             if res.ok:
                 messagebox.showinfo("Xử lý", res.json()["result"])
             else:
-                messagebox.showerror("Lỗi", res.text)
+                messagebox.showerror("Lỗi!", res.text)
         except Exception as e:
-            messagebox.showerror("Lỗi", str(e))
+            messagebox.showerror("Lỗi!", str(e))
 
     def track_request(self):
         request_id = self.entry_id.get()
         if not request_id:
-            messagebox.showerror("Lỗi", "Vui lòng nhập ID yêu cầu.")
+            messagebox.showerror("Lỗi!", "Vui lòng nhập ID của yêu cầu.")
             return
         res = requests.get(f"{API_BASE}/track/{request_id}")
         if res.ok:
