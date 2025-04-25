@@ -257,6 +257,8 @@ def set_priority(request_id):
         return jsonify({"error": "Mức độ ưu tiên không hợp lệ"}), 400
     priority_updated = update_request_priority(request_id, priority)
     if priority_updated:
+         update_request_status(request_id, "Đã cập nhật ưu tiên", f"Đặt ưu tiên thành {priority}")
+
          updated_request = get_request_by_id(request_id)
          return jsonify({"message": "Đã cập nhật mức độ ưu tiên", "request": updated_request.to_dict() if updated_request else None})
     else:
