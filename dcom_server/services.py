@@ -4,8 +4,7 @@ import re
 PRIORITY_KEYWORDS = {
     "Khẩn cấp": [r'khẩn cấp', r'nghiêm trọng', r'không hoạt động', r'sập nguồn', r'không lên nguồn', r'không vào được', r'dừng đột ngột'],
     "Cao": [r'lỗi', r'hỏng', r'không dùng được', r'bảo hành', r'treo', r'đơ', r'không nhận', r'mất kết nối', r'không lưu được'],
-    "Trung bình": [r'chậm', r'lag', r'hướng dẫn', r'cài đặt', r'tư vấn', r'hỏi đáp', r'yêu cầu tính năng'] # Có thể để trống, mặc định là Trung bình
-    # "Thấp": [...] # Có thể thêm mức thấp nếu cần
+    "Trung bình": [r'chậm', r'lag', r'hướng dẫn', r'cài đặt', r'tư vấn', r'hỏi đáp', r'yêu cầu tính năng']
 }
 
 DEFAULT_PRIORITY = "Trung bình"

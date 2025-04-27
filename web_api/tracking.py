@@ -2,22 +2,19 @@ import pyodbc
 import uuid
 from datetime import datetime
 import json # Vẫn cần json để xử lý history nếu lấy ra dạng text
-from config import DB_CONNECTION_STRING # Import chuỗi kết nối từ config.py
-from web_api.models import CustomerRequest, StatusHistory # Import model để tiện chuyển đổi
+from config import DB_CONNECTION_STRING
+from web_api.models import CustomerRequest, StatusHistory
 
 def get_db_connection():
-    """Tạo và trả về một kết nối tới SQL Server."""
     try:
         conn = pyodbc.connect(DB_CONNECTION_STRING)
         return conn
     except pyodbc.Error as ex:
         sqlstate = ex.args[0]
         print(f"Lỗi kết nối Database: {sqlstate} - {ex}")
-        # Có thể raise lỗi hoặc trả về None tùy cách xử lý lỗi mong muốn
-        raise ex # Hoặc return None
+        raise ex
 
 def _map_row_to_request(row, history_rows):
-    """Helper: Chuyển đổi dữ liệu từ row SQL thành object CustomerRequest."""
     if not row:
         return None
 
@@ -34,7 +31,7 @@ def _map_row_to_request(row, history_rows):
     history.sort(key=lambda x: datetime.strptime(x.time, "%Y-%m-%d %H:%M:%S") if x.time else datetime.min)
 
     return CustomerRequest(
-        id=str(row.id), # Chuyển UUID thành string
+        id=str(row.id),
         content=row.content,
         email=row.email,
         category=row.category,
@@ -50,15 +47,13 @@ def _map_row_to_request(row, history_rows):
 
 
 def add_new_request(req_data):
-    """Thêm yêu cầu mới vào database. req_data là một dictionary."""
-    request_id = uuid.uuid4() # Tạo UUID mới
+    request_id = uuid.uuid4()
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Thêm vào bảng Requests
         sql_insert_request = """
             INSERT INTO Requests (id, content, email, category, customer_name, phone, priority, current_status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -75,21 +70,20 @@ def add_new_request(req_data):
                        initial_status # Lưu trạng thái ban đầu
                        )
 
-        # Thêm vào bảng StatusHistory
         sql_insert_history = """
             INSERT INTO StatusHistory (request_id, status, note)
             VALUES (?, ?, ?)
         """
         cursor.execute(sql_insert_history, request_id, initial_status, None) # Note ban đầu là Null
 
-        conn.commit() # Lưu thay đổi
-        return str(request_id) # Trả về ID dạng string
+        conn.commit()
+        return str(request_id)
 
     except pyodbc.Error as ex:
         print(f"Lỗi khi thêm request mới: {ex}")
         if conn:
-            conn.rollback() # Hủy bỏ thay đổi nếu có lỗi
-        return None # Hoặc raise lỗi
+            conn.rollback()
+        return None
     finally:
         if cursor:
             cursor.close()
@@ -97,7 +91,6 @@ def add_new_request(req_data):
             conn.close()
 
 def get_request_by_id(request_id):
-    """Lấy chi tiết một yêu cầu theo ID."""
     conn = None
     cursor = None
     try:
