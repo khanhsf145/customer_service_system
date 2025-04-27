@@ -23,30 +23,8 @@ from web_api.email_util import send_notification_email
 
 staff_api = Blueprint('staff_api', __name__)
 
-# --- (Tùy chọn) Phần xử lý file assignment ---
-# ASSIGNMENTS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'assignments.json') # Cập nhật đường dẫn nếu cần
-# def load_assignments():
-#     """Tải thông tin phân công từ file"""
-#     if not os.path.exists(ASSIGNMENTS_FILE):
-#         return {}
-#     try:
-#         with open(ASSIGNMENTS_FILE, "r", encoding="utf-8") as f:
-#             return json.load(f)
-#     except json.JSONDecodeError:
-#         print(f"Warning: Could not decode JSON from {ASSIGNMENTS_FILE}")
-#         return {} # Trả về dict rỗng nếu file lỗi
-# def save_assignments(data):
-#     """Lưu thông tin phân công vào file"""
-#     os.makedirs(os.path.dirname(ASSIGNMENTS_FILE), exist_ok=True)
-#     with open(ASSIGNMENTS_FILE, "w", encoding="utf-8") as f:
-#         json.dump(data, f, indent=4, ensure_ascii=False)
-# --- Hết phần assignment file ---
-
-
-# === HÀM ĐĂNG NHẬP ===
 @staff_api.route("/auth/login", methods=["POST"])
 def login():
-    """Xử lý đăng nhập cho nhân viên/admin."""
     username = request.json.get("username")
     password = request.json.get("password")
 
@@ -70,18 +48,14 @@ def login():
         "token": token,
         "user": user_info
     })
-# === KẾT THÚC HÀM ĐĂNG NHẬP ===
 
 
-# === HÀM LẤY DỮ LIỆU DASHBOARD ===
 @staff_api.route("/dashboard", methods=["GET"])
 @token_required
 @staff_required
 def get_dashboard():
-    """Lấy dữ liệu thống kê tổng quan cho dashboard."""
     try:
-        # Lấy tất cả request từ DB để thống kê
-        all_requests_list = get_all_requests() # Hàm này trả về list các object CustomerRequest
+        all_requests_list = get_all_requests()
 
         total_requests = len(all_requests_list)
         status_counts = {}
@@ -126,10 +100,8 @@ def get_dashboard():
         import traceback # Import để in traceback đầy đủ hơn khi có lỗi
         traceback.print_exc() # In traceback vào log server để debug
         return jsonify({"error": f"Không thể lấy dữ liệu dashboard: {str(e)}"}), 500
-# === KẾT THÚC HÀM DASHBOARD ===
 
 
-# === CÁC HÀM KHÁC ===
 @staff_api.route("/requests", methods=["GET"])
 @token_required
 @staff_required
