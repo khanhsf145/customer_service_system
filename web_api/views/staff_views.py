@@ -35,15 +35,12 @@ def login():
     user_info = authenticate_user(username, password)
 
     if not user_info:
-        # Hàm authenticate_user trả về None nếu sai thông tin hoặc lỗi
         return jsonify({"error": "Tên đăng nhập hoặc mật khẩu không chính xác"}), 401
 
-    # Xác thực thành công, tạo token
     token = generate_token(user_info)
     if not token:
          return jsonify({"error": "Không thể tạo token xác thực"}), 500
 
-    # Trả về token và thông tin cơ bản của user
     return jsonify({
         "token": token,
         "user": user_info
@@ -82,7 +79,6 @@ def get_dashboard():
 
         # Sắp xếp các yêu cầu đang chờ
         priority_order = {"Khẩn cấp": 4, "Cao": 3, "Trung bình": 2, "Thấp": 1}
-        # Chuyển đổi chuỗi thời gian thành đối tượng datetime để so sánh
         my_pending_requests.sort(key=lambda r: (
              priority_order.get(r['priority'], 0),
              datetime.datetime.strptime(r['created_at'], "%Y-%m-%d %H:%M:%S") if r.get('created_at') else datetime.datetime.min
@@ -97,8 +93,8 @@ def get_dashboard():
         })
     except Exception as e:
         print(f"Lỗi khi lấy dữ liệu dashboard: {e}")
-        import traceback # Import để in traceback đầy đủ hơn khi có lỗi
-        traceback.print_exc() # In traceback vào log server để debug
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": f"Không thể lấy dữ liệu dashboard: {str(e)}"}), 500
 
 
@@ -106,7 +102,6 @@ def get_dashboard():
 @token_required
 @staff_required
 def list_all_requests():
-    """Danh sách tất cả các yêu cầu (đã sửa để dùng DB)"""
     status_filter = request.args.get("status")
     category_filter = request.args.get("category")
     assigned_filter = request.args.get("assigned_to")
@@ -116,7 +111,6 @@ def list_all_requests():
         if assigned_filter == "me": final_assigned_filter = current_user
         elif assigned_filter == "unassigned": final_assigned_filter = "unassigned"
         else: final_assigned_filter = assigned_filter
-    # Cần cập nhật hàm get_all_requests trong tracking.py để hỗ trợ category_filter nếu muốn
     all_requests_list = get_all_requests(status=status_filter, category=category_filter, assigned_to=final_assigned_filter)
     results_dict = {req.id: req.to_dict() for req in all_requests_list}
     return jsonify({"requests": results_dict})
@@ -125,7 +119,6 @@ def list_all_requests():
 @token_required
 @staff_required
 def get_request_details(request_id):
-    """Lấy chi tiết một yêu cầu (đã sửa để dùng DB)"""
     request_obj = get_request_by_id(request_id)
     if not request_obj: return jsonify({"error": "Không tìm thấy yêu cầu"}), 404
     return jsonify(request_obj.to_dict())
@@ -134,7 +127,6 @@ def get_request_details(request_id):
 @token_required
 @staff_required
 def analyze_request(request_id):
-    """Phân tích yêu cầu và tự động cập nhật độ ưu tiên (đã sửa để dùng DB)"""
     request_obj = get_request_by_id(request_id)
     if not request_obj: return jsonify({"error": "Không tìm thấy yêu cầu"}), 404
     note = request.json.get("note", "")
@@ -164,7 +156,6 @@ def analyze_request(request_id):
 @token_required
 @staff_required
 def process_request(request_id):
-    """Xử lý yêu cầu (đã sửa để dùng DB)"""
     request_obj = get_request_by_id(request_id)
     if not request_obj: return jsonify({"error": "Không tìm thấy yêu cầu"}), 404
     note = request.json.get("note", "")
@@ -186,7 +177,6 @@ def process_request(request_id):
 @token_required
 @staff_required
 def update_status(request_id):
-    """Cập nhật trạng thái yêu cầu thủ công (đã sửa để dùng DB)"""
     status = request.json.get("status")
     note = request.json.get("note", "")
     if not status: return jsonify({"error": "Thiếu trạng thái"}), 400
@@ -207,7 +197,6 @@ def update_status(request_id):
 @token_required
 @staff_required
 def assign_request(request_id):
-    """Phân công yêu cầu cho nhân viên (đã sửa để dùng DB)"""
     staff_username = request.json.get("staff_username")
     if not staff_username: return jsonify({"error": "Thiếu tên đăng nhập nhân viên"}), 400
     assignment_updated = update_request_assignment(request_id, staff_username)
@@ -223,7 +212,6 @@ def assign_request(request_id):
 @token_required
 @staff_required
 def set_priority(request_id):
-    """Thiết lập độ ưu tiên cho yêu cầu (đã sửa để dùng DB)"""
     priority = request.json.get("priority")
     if not priority or priority not in ["Thấp", "Trung bình", "Cao", "Khẩn cấp"]:
         return jsonify({"error": "Mức độ ưu tiên không hợp lệ"}), 400

@@ -33,7 +33,7 @@ class ServiceApp:
         tk.Button(root, text="Theo dõi yêu cầu", command=self.track_request).pack(pady=10)
 
         tk.Label(root, text="Kết quả/Lịch sử:").pack(pady=(5,0))
-        self.text_result = tk.Text(root, height=8, width=48, state=tk.DISABLED) # Disable chỉnh sửa
+        self.text_result = tk.Text(root, height=8, width=48, state=tk.DISABLED)
         self.text_result.pack(pady=5, padx=10)
 
     def _update_result_text(self, message):
@@ -56,7 +56,7 @@ class ServiceApp:
 
         try:
             res = requests.post(api_url, json=payload)
-            res.raise_for_status() # Raise HTTPError cho các status code lỗi (4xx, 5xx)
+            res.raise_for_status()
 
             response_data = res.json()
             request_id = response_data.get("id")
@@ -68,7 +68,7 @@ class ServiceApp:
                 messagebox.showinfo("Thành công", f"{message}\nID: {request_id}")
                 self._update_result_text(f"Đã tiếp nhận. ID: {request_id}")
             else:
-                 messagebox.showwarning("Cảnh báo", message) # Hiển thị thông báo từ server
+                 messagebox.showwarning("Cảnh báo", message)
                  self._update_result_text(f"Tiếp nhận có thể chưa thành công: {message}")
 
         except requests.exceptions.RequestException as e:
@@ -88,7 +88,7 @@ class ServiceApp:
 
         api_url = f"{API_BASE}/staff/request/{request_id}/analyze"
         payload = {"note": note_from_gui}
-        print(f"GUI: Calling POST {api_url}") # Log để debug
+        print(f"GUI: Calling POST {api_url}")
 
         try:
             res = requests.post(api_url, json=payload)
@@ -117,7 +117,7 @@ class ServiceApp:
 
         api_url = f"{API_BASE}/staff/request/{request_id}/process"
         payload = {"note": note_from_gui}
-        print(f"GUI: Calling POST {api_url}") # Log để debug
+        print(f"GUI: Calling POST {api_url}")
 
         try:
             res = requests.post(api_url, json=payload)
@@ -126,7 +126,7 @@ class ServiceApp:
             result_text = response_data.get("result", "Không có kết quả.")
             message = f"Kết quả Xử lý (DCOM):\n{result_text}"
             messagebox.showinfo("Xử lý (DCOM)", message)
-            self._update_result_text(message) # Hiển thị kết quả
+            self._update_result_text(message)
 
         except requests.exceptions.RequestException as e:
              messagebox.showerror("Lỗi kết nối/API", f"Lỗi khi gọi API xử lý:\n{e}\nURL: {api_url}")
@@ -151,7 +151,7 @@ class ServiceApp:
 
             history = data.get("history", [])
             content = data.get("content", "N/A")
-            status = data.get("status", "N/A") # Trạng thái hiện tại
+            status = data.get("status", "N/A")
 
             if not history:
                 message = "Chưa có lịch sử trạng thái."

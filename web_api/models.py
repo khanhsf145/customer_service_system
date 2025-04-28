@@ -6,7 +6,6 @@ import uuid
 
 @dataclass
 class StatusHistory:
-    """Lịch sử trạng thái của một yêu cầu"""
     status: str
     time: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     note: Optional[str] = None
@@ -14,7 +13,6 @@ class StatusHistory:
 
 @dataclass
 class CustomerRequest:
-    """Yêu cầu của khách hàng"""
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     content: str = ""
     email: str = ""
@@ -28,13 +26,11 @@ class CustomerRequest:
 
     @property
     def current_status(self) -> str:
-        """Trả về trạng thái hiện tại của yêu cầu"""
         if not self.history:
             return "Chưa xử lý"
         return self.history[-1].status
 
     def add_status(self, status: str, note: Optional[str] = None) -> None:
-        """Thêm trạng thái mới vào lịch sử"""
         self.history.append(StatusHistory(
             status=status,
             time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -42,7 +38,7 @@ class CustomerRequest:
         ))
 
     def to_dict(self) -> Dict:
-        """Chuyển đổi đối tượng thành dictionary để lưu trữ JSON"""
+        # Chuyển đổi đối tượng thành dictionary để lưu trữ JSON
         return {
             "id": self.id,
             "content": self.content,
@@ -58,7 +54,7 @@ class CustomerRequest:
 
     @classmethod
     def from_dict(cls, data: Dict) -> 'CustomerRequest':
-        """Tạo đối tượng từ dictionary"""
+        # Tạo đối tượng từ dictionary
         request = cls(
             id=data.get("id", str(uuid.uuid4())),
             content=data.get("content", "") or data.get("data", ""),  # Hỗ trợ cả hai trường
@@ -86,7 +82,6 @@ class CustomerRequest:
 
 @dataclass
 class User:
-    """Người dùng hệ thống"""
     username: str
     password: str
     role: str = "staff"  # admin, staff
@@ -95,7 +90,6 @@ class User:
     is_active: bool = True
 
     def to_dict(self) -> Dict:
-        """Chuyển đối tượng thành dictionary"""
         return {
             "username": self.username,
             "password": self.password,
@@ -107,7 +101,6 @@ class User:
 
     @classmethod
     def from_dict(cls, data: Dict, username: str) -> 'User':
-        """Tạo đối tượng từ dictionary"""
         return cls(
             username=username,
             password=data.get("password", ""),

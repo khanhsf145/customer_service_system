@@ -1,6 +1,5 @@
 import yagmail
 
-# Cấu hình tài khoản Gmail gửi đi
 GMAIL_USER = "khanhhuyen412005@gmail.com"
 GMAIL_PASSWORD = "modz zrwh qdhp qvse"
 
