@@ -1,9 +1,6 @@
-// static/js/staff.js
+const API_BASE_URL = '';
+let currentRequestId = null;
 
-const API_BASE_URL = ''; // Base URL is the same origin
-let currentRequestId = null; // ID của yêu cầu đang được chọn
-
-// --- Authentication ---
 function getToken() {
     return localStorage.getItem('auth_token');
 }
@@ -23,10 +20,10 @@ function checkAuth() {
     const token = getToken();
     const userInfo = getUserInfo();
     if (!token || !userInfo) {
-        logout(); // Nếu không có token hoặc user info, đăng xuất
+        logout();
         return false;
     }
-     // Hiển thị thông tin người dùng
+
     const userInfoElement = document.getElementById('user-info');
     if (userInfoElement) {
         userInfoElement.textContent = `Xin chào, ${userInfo.name || userInfo.username}! (${userInfo.role})`;
@@ -34,7 +31,6 @@ function checkAuth() {
     return true;
 }
 
-// --- API Calls ---
 async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = true) {
     const headers = {
         'Content-Type': 'application/json'
@@ -44,7 +40,7 @@ async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = tr
         if (!token) {
             console.error('Token not found!');
             logout();
-            return null; // Hoặc throw error
+            return null;
         }
         headers['Authorization'] = `Bearer ${token}`;
     }
@@ -60,7 +56,7 @@ async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = tr
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-        if (response.status === 401) { // Unauthorized
+        if (response.status === 401) {
              console.error('Token hết hạn hoặc không hợp lệ.');
              logout();
              return null;
@@ -69,18 +65,17 @@ async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = tr
             const errorData = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
             throw new Error(errorData.error || `HTTP error ${response.status}`);
         }
-        if (response.status === 204) { // No Content
+        if (response.status === 204) {
             return null;
         }
         return await response.json();
     } catch (error) {
         console.error(`API call to ${endpoint} failed:`, error);
-        alert(`Lỗi khi gọi API: ${error.message}`); // Show error to user
-        return null; // Return null or throw error depending on desired handling
+        alert(`Lỗi khi gọi API: ${error.message}`);
+        return null;
     }
 }
 
-// --- Request List ---
 async function fetchRequests() {
     if (!checkAuth()) return;
 
@@ -127,17 +122,16 @@ function renderRequestList(requests) {
 }
 
 
-// --- Request Details ---
 async function fetchRequestDetails(requestId) {
      if (!checkAuth()) return;
-     currentRequestId = requestId; // Cập nhật ID đang chọn
-     highlightSelectedItem(requestId); // Đánh dấu item được chọn
+     currentRequestId = requestId;
+     highlightSelectedItem(requestId);
 
     const detailContainer = document.getElementById('request-detail');
     const detailContent = document.getElementById('detail-content');
     const detailHeader = document.getElementById('detail-request-id');
 
-    detailContainer.style.display = 'block'; // Hiển thị khung chi tiết
+    detailContainer.style.display = 'block';
     detailContent.innerHTML = '<p>Đang tải chi tiết...</p>';
     detailHeader.textContent = `Chi tiết yêu cầu: ${requestId.substring(0, 8)}...`;
 
@@ -152,11 +146,9 @@ async function fetchRequestDetails(requestId) {
 }
 
 function highlightSelectedItem(requestId) {
-    // Xóa class 'active' khỏi tất cả các item
     document.querySelectorAll('.request-list-container .request-item').forEach(item => {
         item.classList.remove('active');
     });
-    // Thêm class 'active' vào item được chọn
     const selectedItem = document.getElementById(`req-item-${requestId}`);
     if (selectedItem) {
         selectedItem.classList.add('active');
@@ -165,7 +157,7 @@ function highlightSelectedItem(requestId) {
 
 function renderRequestDetails(req) {
     const detailContent = document.getElementById('detail-content');
-    const userInfo = getUserInfo(); // Lấy thông tin user hiện tại
+    const userInfo = getUserInfo();
 
     let historyHtml = '<p>Chưa có lịch sử.</p>';
     if (req.history && req.history.length > 0) {
@@ -181,7 +173,6 @@ function renderRequestDetails(req) {
         historyHtml += '</tbody></table>';
     }
 
-     // Lấy trạng thái hiện tại
     const currentStatus = req.history && req.history.length > 0 ? req.history[req.history.length - 1].status : 'Chưa xác định';
 
 
@@ -252,7 +243,6 @@ function renderRequestDetails(req) {
     `;
 }
 
-// --- Actions ---
 async function callDcomAction(requestId, actionType) {
     if (!checkAuth() || !requestId) return;
     const note = document.getElementById('action-note').value.trim();
@@ -263,9 +253,9 @@ async function callDcomAction(requestId, actionType) {
 
     if (result) {
         alert(`Kết quả ${actionType}: ${result.result}`);
-        fetchRequestDetails(requestId); // Tải lại chi tiết
-        fetchRequests(); // Tải lại danh sách (để cập nhật trạng thái)
-         document.getElementById('action-note').value = ''; // Xóa ghi chú
+        fetchRequestDetails(requestId);
+        fetchRequests();
+         document.getElementById('action-note').value = '';
     } else {
         alert(`Thực hiện ${actionType} thất bại.`);
     }
@@ -274,7 +264,7 @@ async function callDcomAction(requestId, actionType) {
 async function updateRequestStatus(requestId) {
     if (!checkAuth() || !requestId) return;
     const status = document.getElementById('update-status').value;
-    const note = document.getElementById('action-note').value.trim(); // Lấy ghi chú chung
+    const note = document.getElementById('action-note').value.trim();
 
      if (!status) {
         alert('Vui lòng chọn trạng thái mới.');
@@ -286,9 +276,9 @@ async function updateRequestStatus(requestId) {
 
     if (result) {
         alert(result.message || 'Đã cập nhật trạng thái.');
-        fetchRequestDetails(requestId); // Tải lại chi tiết
-        fetchRequests(); // Tải lại danh sách
-        document.getElementById('action-note').value = ''; // Xóa ghi chú
+        fetchRequestDetails(requestId);
+        fetchRequests();
+        document.getElementById('action-note').value = '';
     } else {
         alert('Cập nhật trạng thái thất bại.');
     }
@@ -306,8 +296,8 @@ async function assignStaff(requestId) {
 
      if (result) {
         alert(result.message || 'Đã phân công yêu cầu.');
-        fetchRequestDetails(requestId); // Tải lại chi tiết
-        fetchRequests(); // Tải lại danh sách
+        fetchRequestDetails(requestId);
+        fetchRequests();
     } else {
         alert('Phân công thất bại.');
     }
@@ -324,17 +314,16 @@ async function setPriority(requestId) {
     const result = await fetchAPI(`/staff/request/${requestId}/priority`, 'POST', { priority: priority });
      if (result) {
         alert(result.message || 'Đã cập nhật ưu tiên.');
-        fetchRequestDetails(requestId); // Tải lại chi tiết
-        fetchRequests(); // Tải lại danh sách (có thể cần sort theo prio sau này)
+        fetchRequestDetails(requestId);
+        fetchRequests();
     } else {
         alert('Đặt ưu tiên thất bại.');
     }
 }
 
 
-// --- Initial Load ---
 document.addEventListener('DOMContentLoaded', () => {
     if (checkAuth()) {
-        fetchRequests(); // Tải danh sách yêu cầu khi trang được tải
+        fetchRequests();
     }
 });

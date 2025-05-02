@@ -1,5 +1,3 @@
-# models/request_model.py
-
 from dataclasses import dataclass
 
 @dataclass
