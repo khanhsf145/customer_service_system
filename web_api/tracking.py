@@ -1,7 +1,7 @@
 import pyodbc
 import uuid
 from datetime import datetime
-import json # Vẫn cần json để xử lý history nếu lấy ra dạng text
+import json
 from config import DB_CONNECTION_STRING
 from web_api.models import CustomerRequest, StatusHistory
 
@@ -289,7 +289,7 @@ def update_request_priority(request_id, priority):
         if cursor: cursor.close()
         if conn: conn.close()
 
-# (Tùy chọn) Hàm khởi tạo DB, tạo bảng nếu chưa có
+# Khởi CSDL để tạo bảng nếu chưa có
 def init_db():
     print("Kiểm tra kết nối database...")
     try:
