@@ -1,7 +1,7 @@
 import yagmail
 
-GMAIL_USER = "khanhhuyen412005@gmail.com"
-GMAIL_PASSWORD = "modz zrwh qdhp qvse"
+GMAIL_USER = "1234@gmail.com" // Nhập gmail của mình vào đây
+GMAIL_PASSWORD = "..." // Lấy mật khẩu ứng dụng trên Google
 
 yag = yagmail.SMTP(GMAIL_USER, GMAIL_PASSWORD)
 
