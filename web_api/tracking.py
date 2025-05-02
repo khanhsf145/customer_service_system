@@ -74,7 +74,7 @@ def add_new_request(req_data):
             INSERT INTO StatusHistory (request_id, status, note)
             VALUES (?, ?, ?)
         """
-        cursor.execute(sql_insert_history, request_id, initial_status, None) # Note ban đầu là Null
+        cursor.execute(sql_insert_history, request_id, initial_status, None)
 
         conn.commit()
         return str(request_id)
@@ -94,7 +94,6 @@ def get_request_by_id(request_id):
     conn = None
     cursor = None
     try:
-        # Chuyển string ID thành UUID để query
         try:
             req_uuid = uuid.UUID(request_id)
         except ValueError:
@@ -104,20 +103,17 @@ def get_request_by_id(request_id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Lấy thông tin request chính
         sql_select_request = "SELECT * FROM Requests WHERE id = ?"
         cursor.execute(sql_select_request, req_uuid)
         request_row = cursor.fetchone()
 
         if not request_row:
-            return None # Không tìm thấy request
+            return None
 
-        # Lấy lịch sử trạng thái
         sql_select_history = "SELECT status, status_time, note FROM StatusHistory WHERE request_id = ? ORDER BY status_time ASC" # Lấy ASC để sắp xếp lại trong Python
         cursor.execute(sql_select_history, req_uuid)
         history_rows = cursor.fetchall()
 
-        # Chuyển đổi thành object CustomerRequest
         return _map_row_to_request(request_row, history_rows)
 
     except pyodbc.Error as ex:
@@ -130,7 +126,6 @@ def get_request_by_id(request_id):
             conn.close()
 
 def get_requests_by_email(email):
-    """Lấy danh sách các yêu cầu theo email khách hàng."""
     conn = None
     cursor = None
     requests_list = []
@@ -138,20 +133,15 @@ def get_requests_by_email(email):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Lấy tất cả request IDs cho email này
         sql_select_ids = "SELECT id FROM Requests WHERE email = ?"
         cursor.execute(sql_select_ids, email)
         request_ids = [row.id for row in cursor.fetchall()]
 
-        # Với mỗi ID, lấy chi tiết request và history
-        # (Cách này đơn giản nhưng có thể không hiệu quả nếu nhiều request,
-        # cách tốt hơn là dùng JOIN hoặc một truy vấn phức tạp hơn)
         for req_id_uuid in request_ids:
-            request_detail = get_request_by_id(str(req_id_uuid)) # Gọi lại hàm get_request_by_id
+            request_detail = get_request_by_id(str(req_id_uuid))
             if request_detail:
                 requests_list.append(request_detail)
 
-        # Sắp xếp theo thời gian tạo giảm dần (mới nhất trước)
         requests_list.sort(key=lambda r: datetime.strptime(r.created_at, "%Y-%m-%d %H:%M:%S") if r.created_at else datetime.min, reverse=True)
 
         return requests_list
@@ -167,7 +157,6 @@ def get_requests_by_email(email):
 
 
 def get_all_requests(status=None, category=None, assigned_to=None):
-    """Lấy danh sách tất cả yêu cầu với bộ lọc (cho staff/admin)."""
     conn = None
     cursor = None
     requests_list = []
@@ -186,12 +175,8 @@ def get_all_requests(status=None, category=None, assigned_to=None):
             filters.append("category = ?")
             params.append(category)
         if assigned_to:
-            # Logic cho 'me' cần username của người dùng hiện tại,
-            # điều này nên được xử lý ở view thay vì ở đây.
-            # Tạm thời chỉ lọc theo username cụ thể.
             if assigned_to == "unassigned":
                  filters.append("(assigned_to IS NULL OR assigned_to = '')")
-                 # Không cần thêm param
             else:
                  filters.append("assigned_to = ?")
                  params.append(assigned_to)
@@ -200,17 +185,14 @@ def get_all_requests(status=None, category=None, assigned_to=None):
         if filters:
             sql_base += " WHERE " + " AND ".join(filters)
 
-        # Lấy ID trước
         cursor.execute(sql_base, params)
         request_ids = [row.id for row in cursor.fetchall()]
 
-        # Lấy chi tiết cho từng ID (Tương tự get_requests_by_email)
         for req_id_uuid in request_ids:
-             request_detail = get_request_by_id(str(req_id_uuid)) # Gọi lại hàm get_request_by_id
+             request_detail = get_request_by_id(str(req_id_uuid))
              if request_detail:
                  requests_list.append(request_detail)
 
-        # Sắp xếp theo thời gian tạo giảm dần (mới nhất trước)
         requests_list.sort(key=lambda r: datetime.strptime(r.created_at, "%Y-%m-%d %H:%M:%S") if r.created_at else datetime.min, reverse=True)
 
 
@@ -226,11 +208,9 @@ def get_all_requests(status=None, category=None, assigned_to=None):
             conn.close()
 
 def update_request_status(request_id, status, note=None):
-    """Cập nhật trạng thái yêu cầu: thêm vào history và cập nhật current_status."""
     conn = None
     cursor = None
     try:
-        # Chuyển string ID thành UUID
         try:
             req_uuid = uuid.UUID(request_id)
         except ValueError:
@@ -240,14 +220,12 @@ def update_request_status(request_id, status, note=None):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # 1. Thêm vào StatusHistory
         sql_insert_history = """
             INSERT INTO StatusHistory (request_id, status, note)
             VALUES (?, ?, ?)
         """
         cursor.execute(sql_insert_history, req_uuid, status, note)
 
-        # 2. Cập nhật current_status trong bảng Requests
         sql_update_request = """
             UPDATE Requests SET current_status = ? WHERE id = ?
         """
@@ -268,7 +246,6 @@ def update_request_status(request_id, status, note=None):
             conn.close()
 
 def update_request_assignment(request_id, staff_username):
-    """Cập nhật người được phân công cho yêu cầu."""
     conn = None
     cursor = None
     try:
@@ -281,7 +258,6 @@ def update_request_assignment(request_id, staff_username):
         sql = "UPDATE Requests SET assigned_to = ? WHERE id = ?"
         cursor.execute(sql, staff_username, req_uuid)
         conn.commit()
-        # Kiểm tra xem có dòng nào được cập nhật không
         return cursor.rowcount > 0
     except pyodbc.Error as ex:
         print(f"Lỗi khi cập nhật assignment cho request {request_id}: {ex}")
@@ -292,7 +268,6 @@ def update_request_assignment(request_id, staff_username):
         if conn: conn.close()
 
 def update_request_priority(request_id, priority):
-    """Cập nhật độ ưu tiên cho yêu cầu."""
     conn = None
     cursor = None
     try:
@@ -316,19 +291,11 @@ def update_request_priority(request_id, priority):
 
 # (Tùy chọn) Hàm khởi tạo DB, tạo bảng nếu chưa có
 def init_db():
-    """Khởi tạo database, tạo bảng nếu chưa tồn tại."""
-    # Lấy SQL từ file hoặc định nghĩa trực tiếp ở đây
-    # Tạm thời giả định bảng đã được tạo bằng SSMS
     print("Kiểm tra kết nối database...")
     try:
         conn = get_db_connection()
         print("Kết nối database thành công.")
-        # Có thể thêm lệnh kiểm tra sự tồn tại của bảng ở đây nếu muốn
-        # cursor = conn.cursor()
-        # cursor.execute("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Requests'")
-        # ...
         conn.close()
     except Exception as e:
         print(f"LỖI NGHIÊM TRỌNG: Không thể kết nối hoặc khởi tạo database. {e}")
-        # Nên dừng ứng dụng hoặc xử lý phù hợp
         raise e
