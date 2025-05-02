@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/customer.css">
     <style>
-        /* CSS cho phần chi tiết yêu cầu */
         #request-details-view {
             margin-top: 2rem;
             padding: 1.5rem;
@@ -27,7 +26,7 @@
             font-weight: bold;
             color: var(--danger-color);
         }
-         /* Thêm CSS cho bảng lịch sử */
+
         .history-table {
             width: 100%;
             margin-top: 1rem;
@@ -42,14 +41,13 @@
             background-color: #eee;
         }
         .tab-content {
-            display: none; /* Quan trọng: Ẩn các tab không active */
-            padding-top: 20px; /* Thêm padding để nội dung không dính vào tab */
+            display: none;
+            padding-top: 20px;
         }
         .tab-content.active {
-            display: block; /* Quan trọng: Hiện tab active */
+            display: block;
         }
         .tab-btn {
-            /* CSS cơ bản cho nút, bạn có thể điều chỉnh */
             padding: 10px 15px;
             cursor: pointer;
             border: 1px solid #ccc;
@@ -60,12 +58,12 @@
         }
         .tab-btn.active {
             background-color: white;
-            border-bottom: 1px solid white; /* Che đường kẻ dưới của .tabs */
+            border-bottom: 1px solid white;
             font-weight: bold;
-            position: relative; /* Giúp căn chỉnh nếu cần */
+            position: relative;
         }
         .tabs {
-             border-bottom: 1px solid #ccc; /* Đường kẻ ngang dưới các tab */
+             border-bottom: 1px solid #ccc;
              margin-bottom: 0;
              padding-left: 10px;
         }
@@ -171,28 +169,24 @@
         function openTab(event, tabName) {
              const tabContents = document.getElementsByClassName('tab-content');
              for (let i = 0; i < tabContents.length; i++) {
-                 tabContents[i].classList.remove('active'); // Hide all content divs
+                 tabContents[i].classList.remove('active');
              }
 
              const tabButtons = document.getElementsByClassName('tab-btn');
              for (let i = 0; i < tabButtons.length; i++) {
-                 tabButtons[i].classList.remove('active'); // Deactivate all buttons
+                 tabButtons[i].classList.remove('active');
              }
 
-             document.getElementById(tabName).classList.add('active'); // Show the target content div
-             // Dùng event.currentTarget để chắc chắn lấy đúng nút được nhấn
+             document.getElementById(tabName).classList.add('active');
              if(event && event.currentTarget) {
-                 event.currentTarget.classList.add('active'); // Activate the clicked button
+                 event.currentTarget.classList.add('active');
              }
 
 
-             // Ẩn view chi tiết khi chuyển tab
              closeDetailsView();
          }
 
-        // Hàm submitRequest giữ nguyên
         function submitRequest() {
-           // ... (code giữ nguyên) ...
             const content = document.getElementById('content').value.trim();
             const category = document.getElementById('category').value;
             const email = document.getElementById('email').value.trim();
@@ -207,7 +201,6 @@
                 return;
             }
 
-            // Gọi API để gửi yêu cầu
             fetch('/customer/submit', {
                 method: 'POST',
                 headers: {
@@ -223,7 +216,6 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    // Cố gắng đọc lỗi từ JSON nếu có
                     return response.json().then(errData => {
                         throw new Error(errData.error || 'Có lỗi xảy ra khi gửi yêu cầu');
                     }).catch(() => {
@@ -237,14 +229,13 @@
                 messageElement.className = 'alert alert-success';
                 messageElement.style.display = 'block';
 
-                // Xóa form
+
                 document.getElementById('content').value = '';
-                document.getElementById('email').value = ''; // Có thể xóa hoặc giữ lại email
+                document.getElementById('email').value = '';
                 document.getElementById('name').value = '';
                 document.getElementById('phone').value = '';
 
 
-                // Lưu email vào localStorage để tiện sử dụng sau này
                 localStorage.setItem('last_email', email);
             })
             .catch(error => {
@@ -254,23 +245,21 @@
             });
         }
 
-        // Hàm fetchMyRequests giữ nguyên
+
         function fetchMyRequests() {
-            // ... (code giữ nguyên) ...
             const email = document.getElementById('search-email').value.trim();
             const listElement = document.getElementById('my-requests-list');
-            closeDetailsView(); // Ẩn chi tiết cũ khi tìm kiếm mới
+            closeDetailsView();
 
             if (!email) {
                 listElement.innerHTML = '<div class="alert alert-warning">Vui lòng nhập email của bạn</div>';
                 return;
             }
-             listElement.innerHTML = '<p>Đang tải...</p>'; // Thông báo đang tải
+             listElement.innerHTML = '<p>Đang tải...</p>';
 
             fetch(`/customer/all?email=${encodeURIComponent(email)}`)
                 .then(response => {
                     if (!response.ok) {
-                        // Cố gắng đọc lỗi từ JSON nếu có
                          return response.json().then(errData => {
                             throw new Error(errData.error || 'Có lỗi xảy ra khi lấy danh sách yêu cầu');
                         }).catch(() => {
@@ -287,11 +276,10 @@
 
                     let html = '<div class="requests-list">';
 
-                    // Sắp xếp yêu cầu theo thời gian tạo (mới nhất trước) - giả sử có trường created_at
                      const sortedIds = Object.keys(data.requests).sort((a, b) => {
                         const timeA = data.requests[a].created_at || (data.requests[a].history && data.requests[a].history.length > 0 ? data.requests[a].history[0].time : '0');
                         const timeB = data.requests[b].created_at || (data.requests[b].history && data.requests[b].history.length > 0 ? data.requests[b].history[0].time : '0');
-                        return new Date(timeB) - new Date(timeA); // So sánh ngược để mới nhất lên đầu
+                        return new Date(timeB) - new Date(timeA);
                     });
 
 
@@ -309,7 +297,7 @@
                         if (latestStatus === 'Đã tiếp nhận') statusClass = 'status-pending';
                         else if (latestStatus === 'Đã phân tích' || latestStatus === 'Đang kiểm tra') statusClass = 'status-analyzing';
                         else if (latestStatus === 'Đã xử lý' || latestStatus === 'Đã giải quyết' || latestStatus === 'Đóng yêu cầu') statusClass = 'status-processed';
-                        else statusClass = 'status-pending'; // Trạng thái khác
+                        else statusClass = 'status-pending';
 
                         html += `
                             <div class="request-item">
@@ -339,7 +327,7 @@
                 });
         }
 
-        // *** Sửa hàm viewRequestDetails ***
+
         function viewRequestDetails(requestId) {
             const detailsView = document.getElementById('request-details-view');
             const detailsContent = document.getElementById('details-content-area');
@@ -347,7 +335,7 @@
 
             detailsContent.innerHTML = '<p>Đang tải chi tiết...</p>';
             detailsIdSpan.textContent = `(${requestId.substring(0,8)}...)`;
-            detailsView.style.display = 'block'; // Hiển thị khu vực chi tiết
+            detailsView.style.display = 'block';
 
             fetch(`/customer/status/${requestId}`)
                 .then(response => {
@@ -365,7 +353,7 @@
                     detailHtml += `<p><strong>Danh mục:</strong> ${data.category || 'Chung'}</p>`;
                      detailHtml += `<p><strong>Độ ưu tiên:</strong> ${data.priority || 'Trung bình'}</p>`;
                     detailHtml += `<p><strong>Trạng thái hiện tại:</strong> ${data.status || 'N/A'}</p>`;
-                    detailHtml += `<h4>Nội dung:</h4><p style="background-color: #fff; padding: 10px; border-radius: 4px; white-space: pre-wrap;">${data.content || 'N/A'}</p>`; // white-space: pre-wrap để giữ định dạng xuống dòng
+                    detailHtml += `<h4>Nội dung:</h4><p style="background-color: #fff; padding: 10px; border-radius: 4px; white-space: pre-wrap;">${data.content || 'N/A'}</p>`;
 
                     detailHtml += `<h4>Lịch sử xử lý:</h4>`;
                     if (data.history && data.history.length > 0) {
@@ -381,7 +369,6 @@
                     }
 
                     detailsContent.innerHTML = detailHtml;
-                     // Cuộn trang xuống phần chi tiết
                     detailsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 })
                 .catch(error => {
@@ -400,13 +387,7 @@
             const lastEmail = localStorage.getItem('last_email');
             if (lastEmail) {
                 document.getElementById('search-email').value = lastEmail;
-                // Tùy chọn: tự động tìm kiếm luôn khi có email cũ
-                 // fetchMyRequests();
             }
-             // Gán email cho cả form gửi nếu muốn
-             // if (lastEmail) {
-             //     document.getElementById('email').value = lastEmail;
-             // }
         });
 
     </script>

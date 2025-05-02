@@ -1,11 +1,8 @@
-# create_hashes.py
 from werkzeug.security import generate_password_hash
 
-# Mật khẩu bạn muốn dùng
 admin_password = 'admin123'
 staff_password = 'staff123'
 
-# Tạo chuỗi băm - mỗi lần chạy có thể ra chuỗi khác nhau nhưng đều hợp lệ
 admin_hash = generate_password_hash(admin_password)
 staff_hash = generate_password_hash(staff_password)
 
